@@ -15,22 +15,20 @@ do
     case $REPLY in
 #------------------------------------CREATE DATABSE------------------------------------------------#
     1)
-        read -p "Plesse Entre DB Name: " dbname
-        if [ -d $dbname ];then
+        read -p "Plesse Entre DB Name: " dbnamee 
+        dbname="${dbnamee// /_}"
+        if [ -d ./dbs/$dbname ];then
             echo "the name was exist"
         else
             case $dbname in
-                *['!&()'@#$%^*_+]*)
+                *['!&()'@#$%^*+]*)
                     echo "dont accept special charcters >>Plesse Entre valid Name"
                     ;;
                 [0-9]*)
                     echo "dont accept number at first"
-                    ;;
-                +([a-zA-Z0-9]))
-                    mkdir ./dbs/$dbname
-                    ;;        
+                    ;;       
                 *)
-                    # mkdir ./dbs/$dbname
+                    mkdir ./dbs/$dbname
                 ;;        
             esac
             
@@ -41,14 +39,41 @@ do
 
 #----------------------------------LIST DATABASE--------------------------------------------------#
     2)
-        ls -F ./dbs | grep /
+        if [ -d dbs ];then
+            if [ -z "$(ls -A ./dbs)" ];then
+                echo "NO DATABASE CREATED"
+            else    
+                ls -F ./dbs | grep /
+            fi
+        else
+            mkdir dbs
+            echo "NO DATABASE CREATED"
+        fi        
         ;;
 #-------------------------------------------------------------------------------------------------#
 
 
 #-----------------------------------DROP DATABSAE-------------------------------------------------#
     3)
-        echo "drop"    
+        read -p "Plesse Entre DB Name: " dbnamee2
+        dbname2="${dbnamee2// /_}"
+        
+        case $dbname2 in
+            *['!&()'@#$%^*+]*)
+                echo "dont accept special charcters >>Plesse Entre valid Name"
+                ;;
+            [0-9]*)
+                echo "dont accept number at first"
+                ;;       
+            *)
+                if [ -d ./dbs/$dbname2  ];then
+                    rm -r ./dbs/$dbname2
+                else
+                    echo "Not exist"    
+                fi    
+                ;;
+        esac
+
         ;;
     4)
 #-------------------------------------------------------------------------------------------------#
@@ -57,6 +82,8 @@ do
 #---------------------------------CONNECT TO DATABASE---------------------------------------------#
         echo "connect"    
         ;;
+#-------------------------------------------------------------------------------------------------#
+
     *) 
         echo "wrong choise >> Plesse select from 1 to 4"    
     esac
