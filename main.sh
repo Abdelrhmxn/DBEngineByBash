@@ -75,18 +75,69 @@ do
         esac
 
         ;;
-    4)
 #-------------------------------------------------------------------------------------------------#
 
 
 #---------------------------------CONNECT TO DATABASE---------------------------------------------#
-        echo "connect"    
+    4)
+        read -p "Plesse Entre DB Name: " dbnamee3 
+        dbname3="${dbnamee3// /_}"
+        case $dbname3 in
+            *['!&()'@#$%^*+]*)
+                echo "dont accept special charcters >>Plesse Entre valid Name"
+                ;;
+            [0-9]*)
+                echo "dont accept number at first"
+                ;;       
+            *)
+                if [ -d ./dbs/$dbname3 ];then
+                    cd ./dbs/$dbname3
+                    select y in "Create Table" "Drop Table" "Insert Table" "List Table" "Select" "Update" "Delete" "Exit"
+                    do
+                        case $REPLY in 
+                            1) 
+                                ;;
+                            2)
+                                
+                                ;;
+                            3)
+                                ;;
+                            4)
+                                if [ -z "$(ls -A )" ];then
+                                    echo "NO Tables CREATED"
+                                else    
+                                    ls -F 
+                                fi  
+                                ;;
+                            5)
+                                ;;
+                            6)
+                                ;;
+                            7)
+                                ;;
+                            8)
+                                ;;    
+                            *) 
+                                echo "wrong choise >> Plesse select from 1 to 8" 
+                                ;;       
+                            esac                
+
+                    done
+                else
+                    echo "NO DATABASE WITH THIS NAME" 
+                fi       
+            ;;        
+        esac
+
         ;;
 #-------------------------------------------------------------------------------------------------#
 
+
+#-------------------------------------------------------------------------------------------------#
     *) 
         echo "wrong choise >> Plesse select from 1 to 4"    
     esac
+#-------------------------------------------------------------------------------------------------#
 
 
 done
