@@ -85,10 +85,14 @@ function selectDB {
             echo "dont accept number at first"
             ;;       
         *)
-            if [ -d ./dbs/$dbname3 ];then
+            if [ -z $dbname3 ];then
+                echo "Empty Input "
+                mainMenu;
+            elif [ -d ./dbs/$dbname3 ];then
                 cd ./dbs/$dbname3
                 tableMenu;
             else
+
                 echo "NO DATABASE WITH THIS NAME" 
             fi
     esac        
@@ -222,9 +226,49 @@ function dropTable  {
     tableMenu;
 }
 #-------------------------------------------------------------------------------------------------#
-# function insert {
-
-# }
+function insert {
+    select tableName in $(ls)
+    do
+        colsNum=$(awk 'END{print NR}' .$tableName);
+        sep=":";
+        rSep="\n";
+        for (( i = 2; i <= $colsNum; i++ ))
+        do
+            colName=$(awk 'BEGIN{FS=":"}{if(NR=='$i') print $1}' .$tableName);
+            colType=$(awk 'BEGIN{FS=":"}{if(NR=='$i') print $2}' .$tableName);
+            colKey=$(awk 'BEGIN{FS=":"}{if(NR=='$i') print $3}' .$tableName);
+            read -p "Plesse Entre Value Of Column $colName : " data 
+            if [[ $colType == "int" ]];then
+                while ! [[ $data =~ ^[0-9]+$ ]]
+                do
+                    echo "Invalid Data Type"
+                    read -p "Plesse Entre Value Of Column $colName : " data
+                done
+            fi
+            if [[ $colKey == "PK" ]];then
+                while [[ true ]]
+                do
+                    if [[ $data =~ ^[$(awk 'BEGIN{FS=":"; ORS=" "}{if(NR!=1) print $(('$i'-1))}' $tableName 2>> /dev/null)]$ ]]
+                    then
+                        echo "Invalid Input for PK"
+                        read -p "Plesse Entre Value Of Column $colName : " data
+                    else
+                        break;
+                    fi
+                done
+            fi
+            if [[ $i == $colsNum ]]
+            then
+                row=$row$data$rSep;
+            else
+                row=$row$data$sep;
+            fi
+        done  
+        echo -e $row"\c" >> $tableName;
+        row=""    
+        tableMenu;
+    done
+}
 # #-------------------------------------------------------------------------------------------------#
 # function deleteFromTable {
 
