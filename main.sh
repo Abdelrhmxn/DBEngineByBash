@@ -40,6 +40,7 @@ function createDB {
                 ;;        
         esac
     fi
+    mainMenu;
 }
 #-------------------------------------------------------------------------------------------------#
 function listDBs {
@@ -48,6 +49,7 @@ function listDBs {
     else    
         ls -F ./dbs | grep /
     fi       
+    mainMenu;
 }
 #-------------------------------------------------------------------------------------------------#
 function dropDB {
@@ -69,6 +71,7 @@ function dropDB {
             fi    
             ;;
     esac  
+    mainMenu;
 }
 #-------------------------------------------------------------------------------------------------#
 function selectDB {
@@ -109,7 +112,83 @@ function tableMenu {
 }
 #-------------------------------------------------------------------------------------------------#
 function createTable {
-    
+    read -p "Plesse Entre Table Name: " tnamee2 
+    tname2="${tnamee2// /_}"
+    if [ -f $tname2 ];then
+        echo "the name was exist"
+        tableMenu;
+    else
+        case $tname2 in
+            *['!&()'@#$%^*+]*)
+                echo "dont accept special charcters >> Plesse Entre valid Name"
+                tableMenu
+                ;;
+            [0-9]*)
+                echo "dont accept number at first"
+                tableMenu
+                ;;       
+            *)
+                read -p "Plesse Entre Number of column: " ncol
+                if [[ $ncol =~ ^[0-9]+$ ]];then
+                    counter=1
+                    sep=":"
+                    pKey="";
+                    rSep="\n";
+                    metaData="Field"$sep"Type"$sep"key";
+                    while [[ $counter -le $ncol ]]
+                    do
+                        read -p "Name of Column No.$counter " colname
+                        case $colname in
+                            *['!&()'@#$%^*+]*)
+                                echo "dont accept special charcters >> Plesse Entre valid Name"
+                                tableMenu
+                                ;;
+                            [0-9]*)
+                                echo "dont accept number at first"
+                                tableMenu
+                                ;;       
+                            *)
+                                select xx in "Integer" "String"
+                                do
+                                    case $REPLY in
+                                    1) coltype="int"; break;;
+                                    2) coltype="str"; break;;
+                                    *) tableMenu;;
+                                    esac
+                                done
+                                if [[ $pKey == "" ]];then
+                                    select yy in "PK" "Not PK"
+                                    do
+                                        case $REPLY in
+                                            1) pKey="PK"; metaData+=$rSep$colname$sep$coltype$sep$pKey; break;;
+                                            2) metaData+=$rSep$colname$sep$coltype$sep""; break;;
+                                            *) metaData+=$rSep$colname$sep$coltype$sep""; break;;
+                                        esac
+                                    done
+                                else
+                                    metaData+=$rSep$colname$sep$coltype$sep"";
+                                fi    
+                                if [[ $counter == $ncol ]]
+                                then
+                                    temp=$temp$colname;
+                                else
+                                    temp=$temp$colname$sep;
+                                fi    
+                                ;;
+                        esac    
+                        ((counter++))
+                    done
+                    touch $tname2 .$tname2;
+                    echo -e $metaData  >> .$tname2;
+                    echo -e $temp >> $tname2;
+                    tableMenu
+                else
+                    echo "Entre Just Numbers"
+                    tableMenu
+                fi    
+                ;;        
+        esac
+    fi
 }
 #-------------------------------------------------------------------------------------------------#
 function listTables {
@@ -118,6 +197,7 @@ function listTables {
     else    
         ls -d !(*.*)
     fi
+    tableMenu;
 }
 #-------------------------------------------------------------------------------------------------#
 function dropTable  {
@@ -139,19 +219,20 @@ function dropTable  {
             fi    
             ;;
     esac
+    tableMenu;
 }
 #-------------------------------------------------------------------------------------------------#
-function insert {
+# function insert {
 
-}
-#-------------------------------------------------------------------------------------------------#
-function deleteFromTable {
+# }
+# #-------------------------------------------------------------------------------------------------#
+# function deleteFromTable {
 
-}
-#-------------------------------------------------------------------------------------------------#
-function updateTable {
+# }
+# #-------------------------------------------------------------------------------------------------#
+# function updateTable {
 
-}
+# }
 #-------------------------------------------------------------------------------------------------#
 function selectMenu {
     select z in "Select All" "Select a Column" "Select a Record" "Back To Table Menu" "Back To Main Menu" "Exit"
@@ -168,17 +249,17 @@ function selectMenu {
 
 }
 #-------------------------------------------------------------------------------------------------#
-function selectAll {
+# function selectAll {
 
-}
-#-------------------------------------------------------------------------------------------------#
-function selectColumn {
+# }
+# #-------------------------------------------------------------------------------------------------#
+# function selectColumn {
 
-}
-#-------------------------------------------------------------------------------------------------#
-function selectRecord {
+# }
+# #-------------------------------------------------------------------------------------------------#
+# function selectRecord {
 
-}
+# }
 #-------------------------------------------------------------------------------------------------#    
 
 
