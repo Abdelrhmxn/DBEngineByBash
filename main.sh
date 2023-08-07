@@ -382,12 +382,33 @@ function selectAll {
                 echo "Table is Empty"
             fi    
         fi
+        selectMenu
     done
 }
 #---------------------------------------------------------------------------------------------------------------#
-# function selectColumn {
-
-# }
+function selectColumn {
+    select tableName in $(ls)
+    do
+        if [[ $tableName != "" ]];then
+            select setField in $(awk 'BEGIN{FS=":"; ORS=" "}{if(NR!=1) print $1}' .$tableName)
+            do
+                if [[ $setField != "" ]];then
+                    setFid=$(awk 'BEGIN{FS=":"}{if(NR==1){for(i=1; i<=NF; i++){if($i=="'$setField'") print i}}}' $tableName)
+                    columnRecords=$(awk 'BEGIN{FS=":"}{if(NR!=1) print $'$setFid'}' $tableName)
+                    if [[ $columnRecords != "" ]]
+                    then
+                        field=$(awk 'BEGIN{FS=":"}{if(NR!=1) print $'$setFid'}' $tableName)
+                        echo $field
+                        selectMenu
+                    else
+                        echo "Table is Empty"
+                    fi
+                fi
+            done
+        fi
+        selectMenu
+    done
+}
 #---------------------------------------------------------------------------------------------------------------#
 # function selectRecord {
 
