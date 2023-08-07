@@ -367,9 +367,23 @@ function selectMenu {
 
 }
 #---------------------------------------------------------------------------------------------------------------#
-# function selectAll {
-
-# }
+function selectAll {
+    select tableName in $(ls)
+    do
+        if [[ $tableName != "" ]];then
+            allRecords=$(awk 'BEGIN{FS=":"}{if(NR!=1){for(i=1; i<=NF; i++){print $i}}}' $tableName);
+            if [[ $allRecords != "" ]];then
+                echo "---- List of Records ----"
+                fields=$(awk 'BEGIN{FS=":"; ORS=" "}{if(NR!=1) print "\t"$1"\t"}' .$tableName)
+                recordss=$(awk 'BEGIN{FS=":"}{if(NR!=1){for(i=1; i<=NF; i++){print "\t"$i"\t"}}}' $tableName)
+                echo $fields
+                echo $recordss 
+            else
+                echo "Table is Empty"
+            fi    
+        fi
+    done
+}
 #---------------------------------------------------------------------------------------------------------------#
 # function selectColumn {
 
