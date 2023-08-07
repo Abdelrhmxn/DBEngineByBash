@@ -306,9 +306,51 @@ function deleteFromTable {
     done
 }
 #---------------------------------------------------------------------------------------------------------------#
-# function updateTable {
-
-# }
+function updateTable {
+    select tableName in $(ls)
+    do
+        colsNum=$(awk 'END{print NR}' .$tableName);
+        for (( i = 2; i <= $colsNum; i++ ))
+        do
+            colName=$(awk 'BEGIN{FS=":"}{if(NR=='$i') print $1}' .$tableName);
+            colKey=$(awk 'BEGIN{FS=":"}{if(NR=='$i') print $3}' .$tableName);
+            ((fID=$i-1));
+            if [[ $colKey == "PK" ]]
+            then
+                break;
+            fi
+        done
+        read -p "Plesse Entre Value of primary key: " pkValue
+        if [[ $pkValue != "" ]]
+        then
+            res=$(awk 'BEGIN{FS=":"}{if($'$fID'=="'$pkValue'") print $'$fID'}' $tableName);
+            if [[ $res != "" ]]
+            then
+                select setField in $(awk 'BEGIN{FS=":"; ORS=" "}{if(NR!=1) print $1}' .$tableName)
+                do
+                    if [[ $setField != "" ]];then
+                        setFid=$(awk 'BEGIN{FS=":"}{if(NR==1){for(i=1; i<=NF; i++){if($i=="'$setField'") print i}}}' $tableName)
+                        read -p "Plesse Entre The New Value: " newValue
+                        NR=$(awk 'BEGIN{FS=":"}{if($'$fID'=="'$pkValue'") print NR}' $tableName)  
+                        oldValue=$(awk 'BEGIN{FS=":"}{if(NR=='$NR'){for(i=1; i<=NF; i++){if(i=='$setFid') print $i}}}' $tableName)
+                        sed -i ''$NR's/'$oldValue'/'$newValue'/g' $tableName 2>> /dev/null;
+                        if [[ $? == 0 ]]
+                        then
+                            echo "Row Updated Successfully"
+                            tableMenu
+                        else
+                            echo "Error Updating Data From Table $tableName"
+                            tableMenu
+                        fi
+                    fi     
+                done
+            else
+                echo "Value not Found"
+            fi
+        fi
+        tableMenu
+    done
+}
 #---------------------------------------------------------------------------------------------------------------#
 function selectMenu {
     select z in "Select All" "Select a Column" "Select a Record" "Back To Table Menu" "Back To Main Menu" "Exit"
