@@ -402,6 +402,7 @@ function selectColumn {
                         selectMenu
                     else
                         echo "Table is Empty"
+                        selectMenu
                     fi
                 fi
             done
@@ -410,9 +411,39 @@ function selectColumn {
     done
 }
 #---------------------------------------------------------------------------------------------------------------#
-# function selectRecord {
-
-# }
+function selectRecord {
+    select tableName in $(ls)
+    do
+        if [[ $tableName != "" ]];then
+            colsNum=$(awk 'END{print NR}' .$tableName)
+            for (( i = 2; i <= $colsNum; i++ ))
+            do
+                colName=$(awk 'BEGIN{FS=":"}{if(NR=='$i') print $1}' .$tableName)
+                colKey=$(awk 'BEGIN{FS=":"}{if(NR=='$i') print $3}' .$tableName)
+                ((fID=$i-1));
+                if [[ $colKey == "PK" ]]
+                then
+                    break;
+                fi
+            done
+            read -p "Enter Value of PK: " pkValue
+            if [[ $pkValue != "" ]]
+            then
+                res=$(awk 'BEGIN{FS=":"}{if($'$fID'=="'$pkValue'") print $'$fID'}' $tableName);
+                if [[ $res != "" ]]
+                then
+                fields=$(awk 'BEGIN{FS=":"; ORS=" "}{if(NR!=1) print $1}' .$tableName)
+                recordss=$(awk 'BEGIN{FS=":"}{if(NR!=1 && $'$fID'=='$pkValue'){for(i=1; i<=NF; i++){print $i}}}' $tableName)
+                echo $fields
+                echo $recordss                
+                else
+                    echo "Value not Found"
+                fi
+            fi    
+        fi
+        selectMenu
+    done
+}
 #---------------------------------------------------------------------------------------------------------------#    
 
 
