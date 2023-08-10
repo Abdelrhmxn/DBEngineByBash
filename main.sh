@@ -23,12 +23,16 @@ function mainMenu {
 }
 #---------------------------------------------------------------------------------------------------------------#
 function createDB {
-    read -p "Plesse Entre DB Name: " dbnamee 
-    dbname="${dbnamee// /_}"
-    if [ -d ./dbs/$dbname ];then
+    read -p "Plesse Entre DB Name: " dbNamee 
+    dbName="${dbNamee// /_}"
+    if [[ ! -n $dbName ]];then
+        echo "EMPTY INPUT"
+        mainMenu;
+    fi    
+    if [ -d ./dbs/$dbName ];then
         echo "the name was exist"
     else
-        case $dbname in
+        case $dbName in
             *['!&()'@#$%^*+]*)
                 echo "dont accept special charcters >> Plesse Entre valid Name"
                 ;;
@@ -36,7 +40,7 @@ function createDB {
                 echo "dont accept number at first"
                 ;;       
             *)
-                mkdir ./dbs/$dbname
+                mkdir ./dbs/$dbName
                 ;;        
         esac
     fi
@@ -53,49 +57,36 @@ function listDBs {
 }
 #---------------------------------------------------------------------------------------------------------------#
 function dropDB {
-    read -p "Plesse Entre DB Name: " dbnamee2
-    dbname2="${dbnamee2// /_}"
-    
-    case $dbname2 in
-        *['!&()'@#$%^*+]*)
-            echo "dont accept special charcters >>Plesse Entre valid Name"
-            ;;
-        [0-9]*)
-            echo "dont accept number at first"
-            ;;       
-        *)
-            if [ -d ./dbs/$dbname2  ];then
-                rm -r ./dbs/$dbname2
-            else
-                echo "Not exist"    
-            fi    
-            ;;
-    esac  
+    select dbName in $(ls ./dbs)
+    do
+        dbNum=$(ls ./dbs |wc -l)
+        if [ $REPLY -gt $dbNum ];then
+            echo "Invalid Choise Entre From 1 to $dbNum"
+            mainMenu
+        fi
+        if [ -d ./dbs/$dbName  ];then
+            rm -r ./dbs/$dbName
+            mainMenu
+        fi
+    done  
     mainMenu;
 }
 #---------------------------------------------------------------------------------------------------------------#
 function selectDB {
-    read -p "Plesse Entre DB Name: " dbnamee3 
-    dbname3="${dbnamee3// /_}"
-    case $dbname3 in
-        *['!&()'@#$%^*+]*)
-            echo "dont accept special charcters >>Plesse Entre valid Name"
-            ;;
-        [0-9]*)
-            echo "dont accept number at first"
-            ;;       
-        *)
-            if [ -z $dbname3 ];then
-                echo "Empty Input "
-                mainMenu;
-            elif [ -d ./dbs/$dbname3 ];then
-                cd ./dbs/$dbname3
-                tableMenu;
-            else
-
-                echo "NO DATABASE WITH THIS NAME" 
-            fi
-    esac        
+    select dbName in $(ls ./dbs)
+    do
+        dbNum=$(ls ./dbs |wc -l)
+        if [ $REPLY -gt $dbNum ];then
+            echo "Invalid Choise Entre From 1 to $dbNum"
+            mainMenu
+        fi
+        if [ -d ./dbs/$dbName ];then
+            cd ./dbs/$dbName
+            tableMenu;
+        else
+            echo "NO DATABASE WITH THIS NAME" 
+        fi
+    done        
 }
 #---------------------------------------------------------------------------------------------------------------#
 function tableMenu {
@@ -229,6 +220,11 @@ function dropTable  {
 function insert {
     select tableName in $(ls)
     do
+        tableNum=$(ls |wc -l)
+        if [ $REPLY -gt $tableNum ];then
+            echo "Invalid Choise Entre From 1 to $tableNum"
+            tableMenu
+        fi
         colsNum=$(awk 'END{print NR}' .$tableName);
         sep=":";
         rSep="\n";
@@ -273,6 +269,11 @@ function insert {
 function deleteFromTable {
     select tableName in $(ls)
     do
+        tableNum=$(ls |wc -l)
+        if [ $REPLY -gt $tableNum ];then
+            echo "Invalid Choise Entre From 1 to $tableNum"
+            tableMenu
+        fi
         colsNum=$(awk 'END{print NR}' .$tableName);
         for (( i = 2; i <= $colsNum; i++ ))
         do
@@ -309,6 +310,11 @@ function deleteFromTable {
 function updateTable {
     select tableName in $(ls)
     do
+        tableNum=$(ls |wc -l)
+        if [ $REPLY -gt $tableNum ];then
+            echo "Invalid Choise Entre From 1 to $tableNum"
+            tableMenu
+        fi
         colsNum=$(awk 'END{print NR}' .$tableName);
         for (( i = 2; i <= $colsNum; i++ ))
         do
@@ -370,6 +376,11 @@ function selectMenu {
 function selectAll {
     select tableName in $(ls)
     do
+        tableNum=$(ls |wc -l)
+        if [ $REPLY -gt $tableNum ];then
+            echo "Invalid Choise Entre From 1 to $tableNum"
+            selectMenu
+        fi
         if [[ $tableName != "" ]];then
             allRecords=$(awk 'BEGIN{FS=":"}{if(NR!=1){for(i=1; i<=NF; i++){print $i}}}' $tableName);
             if [[ $allRecords != "" ]];then
@@ -389,6 +400,11 @@ function selectAll {
 function selectColumn {
     select tableName in $(ls)
     do
+        tableNum=$(ls |wc -l)
+        if [ $REPLY -gt $tableNum ];then
+            echo "Invalid Choise Entre From 1 to $tableNum"
+            selectMenu
+        fi
         if [[ $tableName != "" ]];then
             select setField in $(awk 'BEGIN{FS=":"; ORS=" "}{if(NR!=1) print $1}' .$tableName)
             do
@@ -414,6 +430,11 @@ function selectColumn {
 function selectRecord {
     select tableName in $(ls)
     do
+        tableNum=$(ls |wc -l)
+        if [ $REPLY -gt $tableNum ];then
+            echo "Invalid Choise Entre From 1 to $tableNum"
+            selectMenu
+        fi
         if [[ $tableName != "" ]];then
             colsNum=$(awk 'END{print NR}' .$tableName)
             for (( i = 2; i <= $colsNum; i++ ))
