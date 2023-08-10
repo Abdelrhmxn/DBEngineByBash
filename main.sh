@@ -378,11 +378,9 @@ function selectAll {
         if [[ $tableName != "" ]];then
             allRecords=$(awk 'BEGIN{FS=":"}{if(NR!=1){for(i=1; i<=NF; i++){print $i}}}' $tableName);
             if [[ $allRecords != "" ]];then
-                echo "---- List of Records ----"
-                fields=$(awk 'BEGIN{FS=":"; ORS=" "}{if(NR!=1) print "\t"$1"\t"}' .$tableName)
-                recordss=$(awk 'BEGIN{FS=":"}{if(NR!=1){for(i=1; i<=NF; i++){print "\t"$i"\t"}}}' $tableName)
-                echo $fields
-                echo $recordss 
+                echo "---- List of Records ------"
+                cat $tableName | column -t -s ":"
+                echo -e "---------------------------"
             else
                 echo "Table is Empty"
             fi    
@@ -407,8 +405,10 @@ function selectColumn {
                     columnRecords=$(awk 'BEGIN{FS=":"}{if(NR!=1) print $'$setFid'}' $tableName)
                     if [[ $columnRecords != "" ]]
                     then
-                        field=$(awk 'BEGIN{FS=":"}{if(NR!=1) print $'$setFid'}' $tableName)
-                        echo $field
+                        # field=$(awk -F"\n" 'BEGIN{FS=":"}{if(NR!=1) print $'$setFid'}' $tableName)
+                        # echo $field
+                        
+                        awk -F"\n" 'BEGIN{FS=":"}{if(NR!=1) print $'$setFid'}' $tableName
                         selectMenu
                     else
                         echo "Table is Empty"
