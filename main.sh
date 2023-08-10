@@ -196,24 +196,18 @@ function listTables {
 }
 #---------------------------------------------------------------------------------------------------------------#
 function dropTable  {
-    read -p "Plesse Entre Table Name: " tnamee
-    tname="${tnamee// /_}"
-    
-    case $tname in
-        *['!&()'@#$%^*+]*)
-            echo "dont accept special charcters >>Plesse Entre valid Name"
-            ;;
-        [0-9]*)
-            echo "dont accept number at first"
-            ;;       
-        *)
-            if [ -f $tname ];then
-                rm $tname
-            else
-                echo "Not exist"    
-            fi    
-            ;;
-    esac
+    select tableName in $(ls)
+    do
+        tableNum=$(ls |wc -l)
+        if [ $REPLY -gt $tableNum ];then
+            echo "Invalid Choise Entre From 1 to $tableNum"
+            tableMenu
+        fi
+        if [ -f $tableName ];then
+            rm $tableName
+            tableMenu   
+        fi 
+    done
     tableMenu;
 }
 #---------------------------------------------------------------------------------------------------------------#
