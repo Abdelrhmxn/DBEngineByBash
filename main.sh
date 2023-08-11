@@ -51,7 +51,9 @@ function listDBs {
     if [ -z "$(ls -A ./dbs)" ];then
         echo "NO DATABASE CREATED"
     else    
+        echo "-------DBS-------"
         ls -F ./dbs | grep /
+        echo "-----------------"
     fi       
     mainMenu;
 }
@@ -107,13 +109,13 @@ function tableMenu {
 }
 #---------------------------------------------------------------------------------------------------------------#
 function createTable {
-    read -p "Plesse Entre Table Name: " tnamee2 
-    tname2="${tnamee2// /_}"
-    if [ -f $tname2 ];then
+    read -p "Plesse Entre Table Name: " tableNamee 
+    tableName="${tableNamee// /_}"
+    if [ -f $tableName ];then
         echo "the name was exist"
         tableMenu;
     else
-        case $tname2 in
+        case $tableName in
             *['!&()'@#$%^*+]*)
                 echo "dont accept special charcters >> Plesse Entre valid Name"
                 tableMenu
@@ -173,9 +175,9 @@ function createTable {
                         esac    
                         ((counter++))
                     done
-                    touch $tname2 .$tname2;
-                    echo -e $metaData  >> .$tname2;
-                    echo -e $temp >> $tname2;
+                    touch $tableName .$tableName;
+                    echo -e $metaData  >> .$tableName;
+                    echo -e $temp >> $tableName;
                     tableMenu
                 else
                     echo "Entre Just Numbers"
@@ -190,7 +192,9 @@ function listTables {
     if [ -z "$(ls -A )" ];then
         echo "NO DATABASE CREATED"
     else    
-        ls -d !(*.*)
+        echo "-------Tables-------"
+        ls !(*.*)
+        echo "--------------------"
     fi
     tableMenu;
 }
@@ -380,7 +384,7 @@ function selectAll {
             if [[ $allRecords != "" ]];then
                 echo "---- List of Records ------"
                 cat $tableName | column -t -s ":"
-                echo -e "---------------------------"
+                echo "---------------------------"
             else
                 echo "Table is Empty"
             fi    
@@ -405,10 +409,9 @@ function selectColumn {
                     columnRecords=$(awk 'BEGIN{FS=":"}{if(NR!=1) print $'$setFid'}' $tableName)
                     if [[ $columnRecords != "" ]]
                     then
-                        # field=$(awk -F"\n" 'BEGIN{FS=":"}{if(NR!=1) print $'$setFid'}' $tableName)
-                        # echo $field
-                        
+                        echo "---- List of Records ------"
                         awk -F"\n" 'BEGIN{FS=":"}{if(NR!=1) print $'$setFid'}' $tableName
+                        echo "---------------------------"
                         selectMenu
                     else
                         echo "Table is Empty"
@@ -460,7 +463,5 @@ function selectRecord {
     done
 }
 #---------------------------------------------------------------------------------------------------------------#    
-
-
 mainMenu
-
+#---------------------------------------------------------------------------------------------------------------#
